@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "agentic ai"
+version = "0.1.0"
+description = ""
+authors = ["afzalfaizi <afzaalm993@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+langchain-core = "^0.3.28"
+langgraph = "^0.2.60"
+fastapi = "^0.115.6"
+langchain-google-genai = "^2.0.7"
+dependencies = "^7.7.1"
+python-dotenv = "^1.0.1"
+psycopg2 = "^2.9.10"
+langchain-community = "^0.3.13"
+langchain-google-vertexai = "^2.0.9"
+huggingface-hub = "^0.27.0"
+transformers = "^4.47.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
