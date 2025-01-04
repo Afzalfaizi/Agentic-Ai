@@ -35,9 +35,6 @@ app.add_middleware(
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
 loader = TextLoader("data.txt")
 documents = loader.load()
-prompt = hub.pull("hwchase17/openai-tools-agent")
-
-# Split texts and create retriever
 text_splitter = CharacterTextSplitter(chunk_size=1500, chunk_overlap=50)
 texts = text_splitter.split_documents(documents)
 embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
@@ -47,19 +44,14 @@ retriever = db.as_retriever()
 info_retriever = create_retriever_tool(
     retriever,
     "hotel_information_sender",
-    "Searches information about hotel from provided vector and return as accurately as you can.",
+    "Searches hotel-related information from a provided vector store.",
 )
 tools = [info_retriever]
 llm_with_tools = llm.bind_tools(tools)
 
 sys_msg = (
-    "You are Alexandra Hotel's virtual assistant, trained to assist customers with any queries related to the hotel. "
-    "Your primary responsibility is to provide accurate, helpful, and friendly responses. "
-    "You have access to a specialized tool for retrieving detailed and up-to-date information about the hotel, "
-    "such as amenities, room availability, pricing, dining options, events, and policies. Use this tool effectively to provide precise answers. "
-    "If a query is beyond your scope or requires external actions (e.g., booking confirmation, cancellations), "
-    "politely inform the user and guide them to contact the hotel's staff for further assistance. "
-    "Maintain a professional yet approachable tone at all times."
+    "You are Alexandra Hotel's virtual assistant. Your primary role is to provide accurate hotel-related information. "
+    "Use specialized tools to retrieve detailed hotel data including room availability, amenities, and pricing."
 )
 
 # Graph setup
@@ -75,32 +67,22 @@ builder.add_edge("tools", "assistant")
 memory = MemorySaver()
 agent = builder.compile(checkpointer=memory)
 
-# HTML placeholder (optional; you can add your own HTML for debugging)
-html = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>FastAPI WebSocket</title>
-</head>
-<body>
-    <h1>WebSocket Server Running</h1>
-</body>
-</html>
-"""
-
 @app.get("/")
-async def get():
-    return {"message": "FastAPI backend is running!"}
-
+async def root():
+    return {"message": "FastAPI backend for hotel assistant is running!"}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    print("WebSocket connection established")
     try:
         while True:
             data = await websocket.receive_text()
             print(f"Received from client: {data}")
-            # Stream assistant's response
+            messages = [HumanMessage(content=data)]
+            node_to_stream = 'assistant'
+            config = {"configurable": {"thread_id": "1"}}
+            await websocket.send_text("Processing your query...")
             try:
                 async for event in agent.astream_events({"messages": messages}, config, version="v2"):
                     if (
@@ -110,6 +92,6 @@ async def websocket_endpoint(websocket: WebSocket):
                         chunk = event["data"]["chunk"].content
                         await websocket.send_text(chunk)
             except Exception as e:
-                await websocket.send_text(f"Error occurred: {e}")
+                await websocket.send_text(f"Error: {e}")
     except WebSocketDisconnect:
         print("WebSocket disconnected")
