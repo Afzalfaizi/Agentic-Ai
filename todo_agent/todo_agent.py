@@ -1,11 +1,10 @@
 from dotenv import load_dotenv
-from sqlmodel import create_engine, SQLModel, Field, Session, select, inspect
-from fastapi import FastAPI
+from sqlmodel import create_engine, SQLModel, Field, Session, select
+from fastapi import FastAPI, HTTPException
 from contextlib import asynccontextmanager
 import os
 
-
-from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, StateGraph, END
 from langgraph.prebuilt import tools_condition, ToolNode
@@ -24,7 +23,6 @@ class Todo(SQLModel, table=True):
 connection_string: str = str(os.getenv("DATABASE_URI")).replace("postgresql", "postgresql+psycopg")
 
 engine = create_engine(connection_string, connect_args={"sslmode": "require"}, pool_recycle=3600, pool_size=10, echo=True)
-
 
 def create_tables():
     SQLModel.metadata.create_all(engine)
@@ -47,9 +45,18 @@ def index():
     return {"message": "Welcome to My Todo APP"}
 
 # CRUD Operations
+# CRUD Operations with proper docstrings
 def create_todo(title: str, description: str = None, status: str = "pending") -> Todo:
     """
     Add a new todo to the database.
+    
+    Args:
+        title (str): Title of the todo.
+        description (str, optional): Description of the todo. Defaults to None.
+        status (str, optional): Status of the todo. Defaults to "pending".
+
+    Returns:
+        Todo: The created todo object.
     """
     todo = Todo(title=title, description=description, status=status)
     with Session(engine) as session:
@@ -61,6 +68,12 @@ def create_todo(title: str, description: str = None, status: str = "pending") ->
 def read_todos(status: str = None) -> list[Todo]:
     """
     Retrieve todos from the database.
+
+    Args:
+        status (str, optional): Status to filter todos. Defaults to None.
+
+    Returns:
+        list[Todo]: List of todos matching the status filter.
     """
     with Session(engine) as session:
         statement = select(Todo)
@@ -72,6 +85,15 @@ def read_todos(status: str = None) -> list[Todo]:
 def update_todo(todo_id: int, title: str = None, description: str = None, status: str = None) -> Todo:
     """
     Update a todo in the database.
+
+    Args:
+        todo_id (int): ID of the todo to update.
+        title (str, optional): New title of the todo. Defaults to None.
+        description (str, optional): New description of the todo. Defaults to None.
+        status (str, optional): New status of the todo. Defaults to None.
+
+    Returns:
+        Todo: The updated todo object, or None if not found.
     """
     with Session(engine) as session:
         todo = session.get(Todo, todo_id)
@@ -90,7 +112,13 @@ def update_todo(todo_id: int, title: str = None, description: str = None, status
 
 def delete_todo(todo_id: int) -> bool:
     """
-    Delete a todo by ID.
+    Delete a todo from the database.
+
+    Args:
+        todo_id (int): ID of the todo to delete.
+
+    Returns:
+        bool: True if deleted successfully, False if not found.
     """
     with Session(engine) as session:
         todo = session.get(Todo, todo_id)
@@ -99,6 +127,7 @@ def delete_todo(todo_id: int) -> bool:
         session.delete(todo)
         session.commit()
     return True
+
 
 # LLM setup
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", google_api_key=os.getenv("GOOGLE_API_KEY"))
@@ -126,7 +155,7 @@ Maintain a professional, polite, and helpful tone throughout your interactions.
 
 # Assistant definition
 def assistant(state: MessagesState):
-    return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"][-10:])]}
+    return {"messages": [llm_with_tools.invoke([sys_msg] + state["messages"][-10:])]}  # Include recent messages
 
 # Graph nodes and edges
 builder = StateGraph(MessagesState)
@@ -146,7 +175,6 @@ agent = builder.compile(checkpointer=memory)
 # API for chatbot interaction
 @app.get("/chat/{query}")
 def get_content(query: str):
-    print(query)
     try:
         config = {"configurable": {"thread_id": "2"}}
         result = agent.invoke({"messages": [("user", query)]}, config)
