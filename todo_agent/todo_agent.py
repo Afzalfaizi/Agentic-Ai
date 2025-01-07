@@ -172,9 +172,13 @@ memory = MemorySaver()
 # Build the graph
 agent = builder.compile(checkpointer=memory)
 
-# API for chatbot interaction
+# Chat API Endpoint
 @app.get("/chat/{query}")
 def get_content(query: str):
+    """
+    Process chat queries and return responses
+    Uses a fixed thread_id for demonstration purposes
+    """
     try:
         config = {"configurable": {"thread_id": "2"}}
         result = agent.invoke({"messages": [("user", query)]}, config)
