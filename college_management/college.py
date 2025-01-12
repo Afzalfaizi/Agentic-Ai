@@ -71,68 +71,68 @@ def add_student(name: str, email: str, phone: str, class_name: str) -> Student:
         session.refresh(student)
     return student
 
-# def read_todos(status: str = None) -> list[Todo]:
-#     """
-#     Retrieve todos from the database.
+def read_todos(status: str = None) -> list[Todo]:
+    """
+    Retrieve todos from the database.
 
-#     Args:
-#         status (str, optional): Status to filter todos. Defaults to None.
+    Args:
+        status (str, optional): Status to filter todos. Defaults to None.
 
-#     Returns:
-#         list[Todo]: List of todos matching the status filter.
-#     """
-#     with Session(engine) as session:
-#         statement = select(Todo)
-#         if status:
-#             statement = statement.where(Todo.status == status)
-#         todos = session.exec(statement).all()
-#     return todos
+    Returns:
+        list[Todo]: List of todos matching the status filter.
+    """
+    with Session(engine) as session:
+        statement = select(Todo)
+        if status:
+            statement = statement.where(Todo.status == status)
+        todos = session.exec(statement).all()
+    return todos
 
-# def update_todo(todo_id: int, title: str = None, description: str = None, status: str = None) -> Todo:
-#     """
-#     Update a todo in the database.
+def update_todo(todo_id: int, title: str = None, description: str = None, status: str = None) -> Todo:
+    """
+    Update a todo in the database.
 
-#     Args:
-#         todo_id (int): ID of the todo to update.
-#         title (str, optional): New title of the todo. Defaults to None.
-#         description (str, optional): New description of the todo. Defaults to None.
-#         status (str, optional): New status of the todo. Defaults to None.
+    Args:
+        todo_id (int): ID of the todo to update.
+        title (str, optional): New title of the todo. Defaults to None.
+        description (str, optional): New description of the todo. Defaults to None.
+        status (str, optional): New status of the todo. Defaults to None.
 
-#     Returns:
-#         Todo: The updated todo object, or None if not found.
-#     """
-#     with Session(engine) as session:
-#         todo = session.get(Todo, todo_id)
-#         if not todo:
-#             return None
-#         if title:
-#             todo.title = title
-#         if description:
-#             todo.description = description
-#         if status:
-#             todo.status = status
-#         session.add(todo)
-#         session.commit()
-#         session.refresh(todo)
-#     return todo
+    Returns:
+        Todo: The updated todo object, or None if not found.
+    """
+    with Session(engine) as session:
+        todo = session.get(Todo, todo_id)
+        if not todo:
+            return None
+        if title:
+            todo.title = title
+        if description:
+            todo.description = description
+        if status:
+            todo.status = status
+        session.add(todo)
+        session.commit()
+        session.refresh(todo)
+    return todo
 
-# def delete_todo(todo_id: int) -> bool:
-#     """
-#     Delete a todo from the database.
+def delete_todo(todo_id: int) -> bool:
+    """
+    Delete a todo from the database.
 
-#     Args:
-#         todo_id (int): ID of the todo to delete.
+    Args:
+        todo_id (int): ID of the todo to delete.
 
-#     Returns:
-#         bool: True if deleted successfully, False if not found.
-#     """
-#     with Session(engine) as session:
-#         todo = session.get(Todo, todo_id)
-#         if not todo:
-#             return False
-#         session.delete(todo)
-#         session.commit()
-#     return True
+    Returns:
+        bool: True if deleted successfully, False if not found.
+    """
+    with Session(engine) as session:
+        todo = session.get(Todo, todo_id)
+        if not todo:
+            return False
+        session.delete(todo)
+        session.commit()
+    return True
 
 
 # LLM setup
