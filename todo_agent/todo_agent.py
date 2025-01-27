@@ -118,7 +118,7 @@ def delete_todo(todo_id: int) -> bool:
         todo_id (int): ID of the todo to delete.
 
     Returns:
-        bool: True if deleted successfully, False if not found.
+        bool: True if deleted successfully, False if todo not found.
     """
     with Session(engine) as session:
         todo = session.get(Todo, todo_id)
