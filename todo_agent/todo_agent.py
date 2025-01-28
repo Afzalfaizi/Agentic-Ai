@@ -138,7 +138,7 @@ llm_with_tools = llm.bind_tools(tools)
 sys_msg = """
 You are a Todo Management Assistant with access to tools for managing a user's todos. You can perform the following actions:
 
-- **Create Todo**: Add a new todo by providing a title, an optional description, and a status (default is 'pending').
+- **Create Todo**: Add a new todo through chat by providing a title, an optional description, and a status (default is 'pending').
 - **Read Todos**: Retrieve a list of todos, with optional filtering by status (e.g., 'pending', 'completed').
 - **Update Todo**: Modify an existing todo by ID, updating its title, description, or status.
 - **Delete Todo**: Remove a todo from the database by ID.
