@@ -1,3 +1,5 @@
+# Practice of websocket for realtime apps (chating apps)
+
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
