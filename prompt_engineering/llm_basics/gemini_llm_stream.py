@@ -11,7 +11,7 @@ llm = GoogleGenerativeAI(
     google_api_key=os.getenv("GOOGLE_API_KEY")
     )
 
-question = input("Enter you prompt: make a exercise plan for 1 week according to my weight  ")
+question = input("Enter you prompt: make a exercise plan for 1 week according to my weight. My weight is 80 kG  ")
 
 for chunk in llm.stream(question):
     print(chunk)
