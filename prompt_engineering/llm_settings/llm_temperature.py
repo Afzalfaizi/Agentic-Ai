@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 
-temperature = float(input("Enter LLM temperature: "))
+temperature = float(input("Enter LLM temperature:0.5 "))
 
 llm = GoogleGenerativeAI(
      model="gemini-1.5-flash",
