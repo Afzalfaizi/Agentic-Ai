@@ -46,7 +46,7 @@ app = FastAPI(lifespan=lifespan)
 
 @app.get('/')
 def index():
-    return {"message": "Welcome to My College Management APP"}
+    return {"message": "Welcome to My AI College Management System"}
 
 # CRUD Operations
 # CRUD Operations with proper docstrings
