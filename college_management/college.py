@@ -55,7 +55,7 @@ def add_student(name: str, email: str, phone: str, class_name: str) -> Student:
     Add a new student to the database.
     
     Args:
-        name (str): The name of the student.
+        name (str): The name of the  college student.
         email (str): The email of the student.
         phone (str): The phone number of the student.
         class_name (str): The class name of the student.
